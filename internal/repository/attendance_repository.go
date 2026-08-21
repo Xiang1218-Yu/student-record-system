@@ -30,6 +30,16 @@ func (r *AttendanceRepository) FindByCourseStudent(db *gorm.DB, courseID, studen
 	return &a, nil
 }
 
+// FindByCourseStudentAndMethod loads a record using the way the student
+// checked in as part of the identity.
+func (r *AttendanceRepository) FindByCourseStudentAndMethod(db *gorm.DB, courseID, studentID, method string) (*models.Attendance, error) {
+	var a models.Attendance
+	if err := db.Where("course_id = ? AND student_id = ? AND check_in_method = ?", courseID, studentID, method).First(&a).Error; err != nil {
+		return nil, err
+	}
+	return &a, nil
+}
+
 // ListByCourse returns all attendance rows for a course, with student loaded.
 func (r *AttendanceRepository) ListByCourse(db *gorm.DB, courseID string) ([]models.Attendance, error) {
 	var records []models.Attendance

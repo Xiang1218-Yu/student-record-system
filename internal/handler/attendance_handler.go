@@ -64,6 +64,7 @@ func (h *AttendanceHandler) CheckIn(c *gin.Context) {
 func (h *AttendanceHandler) CheckInManual(c *gin.Context) {
 	var in struct {
 		StudentID string `json:"student_id"`
+		Method    string `json:"method"`
 	}
 	if err := c.ShouldBindJSON(&in); err != nil {
 		httpx.Error(c, httpx.NewAppError(http.StatusBadRequest, "invalid request body", err))
@@ -73,7 +74,7 @@ func (h *AttendanceHandler) CheckInManual(c *gin.Context) {
 		httpx.Error(c, httpx.NewAppError(http.StatusBadRequest, "student_id is required", nil))
 		return
 	}
-	rec, err := h.attendance.CheckInManual(c.Param("id"), in.StudentID)
+	rec, err := h.attendance.CheckInManual(c.Param("id"), in.StudentID, in.Method)
 	if err != nil {
 		httpx.Error(c, httpx.NewAppError(http.StatusBadRequest, err.Error(), err))
 		return
