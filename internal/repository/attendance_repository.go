@@ -22,9 +22,9 @@ func (r *AttendanceRepository) Create(db *gorm.DB, a *models.Attendance) error {
 }
 
 // FindByCourseStudent loads an attendance row for a course+student pair.
-func (r *AttendanceRepository) FindByCourseStudent(db *gorm.DB, courseID, studentID string) (*models.Attendance, error) {
+func (r *AttendanceRepository) FindByCourseStudent(db *gorm.DB, courseID, studentID, method string) (*models.Attendance, error) {
 	var a models.Attendance
-	if err := db.Where("course_id = ? AND student_id = ?", courseID, studentID).First(&a).Error; err != nil {
+	if err := db.Where("course_id = ? AND student_id = ? AND check_in_method = ?", courseID, studentID, method).First(&a).Error; err != nil {
 		return nil, err
 	}
 	return &a, nil

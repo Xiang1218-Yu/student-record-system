@@ -16,8 +16,8 @@ import (
 // QR validity window: a code is active from 30 minutes before the course
 // starts until 30 minutes after it ends.
 const (
-	qrLeadMinutes  = 30
-	qrTrailMinutes = 30
+	qrLeadMinutes    = 30
+	qrTrailMinutes   = 30
 	lateGraceMinutes = 30
 )
 
@@ -106,7 +106,7 @@ func (s *AttendanceService) recordCheckIn(courseID, studentID string, method str
 	if _, err := s.enrolls.FindActive(s.db, courseID, studentID); err != nil {
 		return nil, errors.New("您未报名该课程")
 	}
-	if existing, err := s.attendance.FindByCourseStudent(s.db, courseID, studentID); err == nil && existing != nil {
+	if existing, err := s.attendance.FindByCourseStudent(s.db, courseID, studentID, method); err == nil && existing != nil {
 		return nil, fmt.Errorf("已签到，无需重复签到")
 	} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err

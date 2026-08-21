@@ -23,12 +23,12 @@ const (
 // Attendance mirrors the attendances table.
 type Attendance struct {
 	ID            string         `gorm:"type:uuid;primaryKey" json:"id"`
-	CourseID      string         `gorm:"type:uuid;not null;index" json:"course_id"`
-	StudentID     string         `gorm:"type:uuid;not null;index" json:"student_id"`
+	CourseID      string         `gorm:"type:uuid;not null;index;uniqueIndex:uq_attendance_course_student_method" json:"course_id"`
+	StudentID     string         `gorm:"type:uuid;not null;index;uniqueIndex:uq_attendance_course_student_method" json:"student_id"`
 	Student       *User          `gorm:"foreignKey:StudentID" json:"student,omitempty"`
 	CheckInTime   *time.Time     `json:"check_in_time"`
 	Status        string         `gorm:"size:20;not null" json:"status"`
-	CheckInMethod string         `gorm:"size:20" json:"check_in_method"`
+	CheckInMethod string         `gorm:"size:20;uniqueIndex:uq_attendance_course_student_method" json:"check_in_method"`
 	CreatedAt     time.Time      `json:"created_at"`
 	UpdatedAt     time.Time      `json:"updated_at"`
 	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
