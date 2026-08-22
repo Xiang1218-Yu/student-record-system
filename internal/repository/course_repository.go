@@ -66,9 +66,11 @@ func (r *CourseRepository) FindByTeacher(db *gorm.DB, teacherID string) ([]model
 // CountActiveByTeacher returns the number of scheduled or ongoing courses
 // owned by a teacher. Used by the teacher-delete referential-integrity check
 // so a teacher cannot be removed while still responsible for live courses.
+// "Active" deliberately excludes completed/cancelled courses, which no longer
+// tie the teacher to a live session.
 func (r *CourseRepository) CountActiveByTeacher(db *gorm.DB, teacherID string) (int64, error) {
 	var n int64
-	activeStatuses := []string{models.CourseStatusScheduled}
+	activeStatuses := []string{models.CourseStatusScheduled, models.CourseStatusOngoing}
 	err := db.Model(&models.Course{}).
 		Where("teacher_id = ? AND status IN ?", teacherID, activeStatuses).
 		Count(&n).Error

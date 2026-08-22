@@ -152,7 +152,10 @@ func (s *TeacherService) UpdatePassword(id string, in TeacherPasswordInput) erro
 
 // Delete removes a teacher account. It refuses when the teacher still owns any
 // scheduled or ongoing course so courses never lose their owner; the caller
-// must reassign or complete those courses first. The delete is a soft delete
+// must reassign or complete those courses first. That refusal is a state
+// conflict (ErrConflict), not a missing resource — the teacher and their
+// courses are all present, and the delete is rejected and left intact. Only a
+// teacher with no active courses may be deleted. The delete is a soft delete
 // (User carries gorm.DeletedAt) so historical records remain intact.
 func (s *TeacherService) Delete(id string) error {
 	if _, err := s.loadTeacher(id); err != nil {
@@ -167,7 +170,7 @@ func (s *TeacherService) Delete(id string) error {
 			"cannot delete teacher with %d active course(s); reassign or complete them first",
 			active,
 		)
-		return fmt.Errorf("%s: %w", message, ErrNotFound)
+		return fmt.Errorf("%s: %w", message, ErrConflict)
 	}
 	return s.users.Delete(s.db, id)
 }
