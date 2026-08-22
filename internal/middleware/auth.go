@@ -52,7 +52,7 @@ func Auth(mgr *jwtauth.Manager) gin.HandlerFunc {
 func RequireRole(roles ...string) gin.HandlerFunc {
 	allowed := make(map[string]struct{}, len(roles))
 	for _, r := range roles {
-		allowed[r] = struct{}{}
+		allowed[strings.ToLower(strings.TrimSpace(r))] = struct{}{}
 	}
 	return func(c *gin.Context) {
 		uc, ok := httpx.ClaimsFromContext(c)
@@ -60,7 +60,7 @@ func RequireRole(roles ...string) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "unauthorized"})
 			return
 		}
-		if _, ok := allowed[uc.Role]; !ok {
+		if _, ok := allowed[strings.ToLower(strings.TrimSpace(uc.Role))]; !ok {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"success": false, "error": "forbidden: insufficient role"})
 			return
 		}

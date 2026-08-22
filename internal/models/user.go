@@ -4,6 +4,7 @@
 package models
 
 import (
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -29,4 +30,9 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 		u.ID = uuid.NewString()
 	}
 	return nil
+}
+
+// ApplyRegistrationRole applies the role supplied by a registration flow.
+func (u *User) ApplyRegistrationRole(role string) {
+	u.Role = strings.ToLower(strings.TrimSpace(role))
 }

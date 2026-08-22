@@ -117,6 +117,9 @@ func (s *AuthService) claimAccount(existing *models.User, in RegisterInput) (str
 		return "", nil, err
 	}
 	existing.PasswordHash = hash
+	if requestedRole := strings.ToLower(strings.TrimSpace(in.Role)); requestedRole != "" {
+		existing.Role = requestedRole
+	}
 	if in.Name != "" {
 		existing.Name = in.Name
 	}

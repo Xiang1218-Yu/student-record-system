@@ -5,6 +5,7 @@ package handler
 
 import (
 	"net/http"
+	"strings"
 
 	"course-attendance/internal/service"
 	"course-attendance/pkg/httpx"
@@ -29,6 +30,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		httpx.Error(c, httpx.NewAppError(http.StatusBadRequest, "invalid request body", err))
 		return
 	}
+	in.Role = strings.ToLower(strings.TrimSpace(in.Role))
 	token, user, err := h.auth.Register(in)
 	if err != nil {
 		httpx.Error(c, httpx.NewAppError(http.StatusBadRequest, err.Error(), err))
