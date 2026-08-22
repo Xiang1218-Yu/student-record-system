@@ -1,0 +1,36 @@
+{{define "register.html"}}{{template "head" .}}
+{{template "nav" .}}
+<div class="max-w-md mx-auto bg-white rounded-lg shadow p-6 mt-8">
+  <h1 class="text-xl font-semibold mb-4">注册</h1>
+  {{if .Data}}{{with $d := .Data}}{{if $d.error}}<p class="text-red-500 text-sm mb-3">{{$d.error}}</p>{{end}}{{end}}{{end}}
+  <form method="POST" action="/register" class="space-y-3">
+    <div>
+      <label class="block text-sm text-slate-600 mb-1">姓名</label>
+      <input type="text" name="name" required class="w-full border rounded px-3 py-2">
+    </div>
+    <div>
+      <label class="block text-sm text-slate-600 mb-1">邮箱</label>
+      <input type="email" name="email" required class="w-full border rounded px-3 py-2">
+    </div>
+    <div>
+      <label class="block text-sm text-slate-600 mb-1">手机号</label>
+      <input type="text" name="phone" class="w-full border rounded px-3 py-2">
+    </div>
+    <div>
+      <label class="block text-sm text-slate-600 mb-1">密码</label>
+      <input type="password" name="password" required class="w-full border rounded px-3 py-2">
+    </div>
+    <div>
+      <label class="block text-sm text-slate-600 mb-1">角色</label>
+      <select name="role" class="w-full border rounded px-3 py-2">
+        <option value="student">学员</option>
+        <option value="teacher">讲师</option>
+        <option value="admin">管理员</option>
+      </select>
+    </div>
+    <button type="submit" class="w-full bg-indigo-600 text-white rounded py-2 hover:bg-indigo-700">注册</button>
+  </form>
+  <p class="text-sm text-slate-500 mt-4">已有账号？<a href="/login" class="text-indigo-600">登录</a></p>
+</div>
+{{template "foot" .}}
+{{end}}
