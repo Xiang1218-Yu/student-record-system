@@ -1,0 +1,4 @@
+/* app.css — small supplement to Tailwind CDN for elements that benefit
+   from a stable default regardless of CDN availability. */
+body { -webkit-font-smoothing: antialiased; }
+table { border-collapse: collapse; }
