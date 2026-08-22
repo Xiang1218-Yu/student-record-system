@@ -1,0 +1,23 @@
+{{define "nav"}}
+<nav class="bg-white shadow-sm">
+  <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="/" class="font-semibold text-lg text-indigo-600">📋 课程考勤</a>
+    <div class="flex items-center gap-4 text-sm">
+      <a href="/" class="hover:text-indigo-600">课程列表</a>
+      <a href="/my-schedule" class="hover:text-indigo-600">我的课表</a>
+      <a href="/attendance" class="hover:text-indigo-600">出勤统计</a>
+      <a href="/students" class="hover:text-indigo-600">学员管理</a>
+      {{if and .User (eq .User.Role "admin")}}
+      <a href="/teachers" class="hover:text-indigo-600">讲师管理</a>
+      {{end}}
+      {{if .User}}
+        <span class="text-slate-500">{{.User.Name}} · {{.User.Role}}</span>
+        <a href="/logout" class="text-slate-500 hover:text-red-500">退出</a>
+      {{else}}
+        <a href="/login" class="text-indigo-600">登录</a>
+      {{end}}
+    </div>
+  </div>
+</nav>
+<main class="max-w-5xl mx-auto px-4 py-6">
+{{end}}
