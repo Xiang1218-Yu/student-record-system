@@ -25,6 +25,9 @@ type User struct {
 
 // BeforeCreate ensures new users receive a UUID before being persisted.
 func (u *User) BeforeCreate(tx *gorm.DB) error {
+	if err := tx.Statement.Context.Err(); err != nil {
+		return err
+	}
 	if u.ID == "" {
 		u.ID = uuid.NewString()
 	}

@@ -4,6 +4,7 @@
 package repository
 
 import (
+	"context"
 	"course-attendance/internal/models"
 
 	"gorm.io/gorm"
@@ -22,10 +23,19 @@ func (r *UserRepository) Create(db *gorm.DB, user *models.User) error {
 	return db.Create(user).Error
 }
 
+// CreateContext persists a user using the context already attached to db.
+func (r *UserRepository) CreateContext(db *gorm.DB, user *models.User) error {
+	return db.WithContext(db.Statement.Context).Create(user).Error
+}
+
 // FindByEmail loads a user by email.
 func (r *UserRepository) FindByEmail(db *gorm.DB, email string) (*models.User, error) {
+	return r.FindByEmailContext(context.Background(), db, email)
+}
+
+func (r *UserRepository) FindByEmailContext(ctx context.Context, db *gorm.DB, email string) (*models.User, error) {
 	var u models.User
-	if err := db.Where("email = ?", email).First(&u).Error; err != nil {
+	if err := db.WithContext(ctx).Where("email = ?", email).First(&u).Error; err != nil {
 		return nil, err
 	}
 	return &u, nil

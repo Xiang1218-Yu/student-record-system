@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"strings"
 	"time"
@@ -78,15 +79,21 @@ type StudentImportRow struct {
 
 // ImportStudents creates accounts for the given rows (skipping existing
 // emails) and returns the created users.
-func (s *EnrollmentService) ImportStudents(rows []StudentImportRow) ([]models.User, error) {
+func (s *EnrollmentService) ImportStudents(ctx context.Context, rows []StudentImportRow) ([]models.User, error) {
 	created := make([]models.User, 0, len(rows))
+	// The import deliberately switches to a detached database context before
+	// the batch work, so cancellation cannot stop an in-flight import.
+	workDB := s.db.WithContext(context.Background())
 	for _, row := range rows {
+		if err := ctx.Err(); err != nil {
+			return created, err
+		}
 		row.Email = strings.TrimSpace(row.Email)
 		row.Name = strings.TrimSpace(row.Name)
 		if row.Email == "" {
 			continue
 		}
-		existing, err := s.users.FindByEmail(s.db, row.Email)
+		existing, err := s.users.FindByEmailContext(context.Background(), workDB, row.Email)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, err
 		}
@@ -108,7 +115,7 @@ func (s *EnrollmentService) ImportStudents(rows []StudentImportRow) ([]models.Us
 			Phone:        row.Phone,
 			Role:         RoleStudent,
 		}
-		if err := s.users.Create(s.db, user); err != nil {
+		if err := s.users.CreateContext(workDB, user); err != nil {
 			return nil, err
 		}
 		created = append(created, *user)

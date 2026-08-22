@@ -67,7 +67,7 @@ func (h *EnrollmentHandler) Import(c *gin.Context) {
 		httpx.Error(c, httpx.NewAppError(http.StatusBadRequest, err.Error(), err))
 		return
 	}
-	created, err := h.enrolls.ImportStudents(rows)
+	created, err := h.enrolls.ImportStudents(c.Request.Context(), rows)
 	if err != nil {
 		httpx.Error(c, httpx.NewAppError(http.StatusBadRequest, err.Error(), err))
 		return
