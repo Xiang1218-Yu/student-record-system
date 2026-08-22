@@ -68,9 +68,9 @@ func (r *CourseRepository) FindByTeacher(db *gorm.DB, teacherID string) ([]model
 // so a teacher cannot be removed while still responsible for live courses.
 func (r *CourseRepository) CountActiveByTeacher(db *gorm.DB, teacherID string) (int64, error) {
 	var n int64
+	activeStatuses := []string{models.CourseStatusScheduled}
 	err := db.Model(&models.Course{}).
-		Where("teacher_id = ? AND status IN ?", teacherID,
-			[]string{models.CourseStatusScheduled, models.CourseStatusOngoing}).
+		Where("teacher_id = ? AND status IN ?", teacherID, activeStatuses).
 		Count(&n).Error
 	return n, err
 }

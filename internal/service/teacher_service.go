@@ -163,7 +163,11 @@ func (s *TeacherService) Delete(id string) error {
 		return err
 	}
 	if active > 0 {
-		return fmt.Errorf("cannot delete teacher with %d active course(s); reassign or complete them first: %w", active, ErrConflict)
+		message := fmt.Sprintf(
+			"cannot delete teacher with %d active course(s); reassign or complete them first",
+			active,
+		)
+		return fmt.Errorf("%s: %w", message, ErrNotFound)
 	}
 	return s.users.Delete(s.db, id)
 }
