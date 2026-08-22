@@ -1,0 +1,64 @@
+{{define "teachers.html"}}{{template "head" .}}
+{{template "nav" .}}
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-xl font-semibold">讲师管理</h1>
+  <button id="new-btn" class="bg-indigo-600 text-white text-sm rounded px-3 py-2 hover:bg-indigo-700">新增讲师</button>
+</div>
+{{with $d := .Data}}
+{{if $d.teachers}}
+<div class="bg-white rounded-lg shadow overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-100 text-slate-600">
+      <tr><th class="text-left px-4 py-2">姓名</th><th class="text-left px-4 py-2">邮箱</th><th class="text-left px-4 py-2">手机号</th><th class="text-left px-4 py-2">操作</th></tr>
+    </thead>
+    <tbody>
+    {{range $d.teachers}}
+      <tr class="border-t" data-id="{{.ID}}">
+        <td class="px-4 py-2 t-name">{{.Name}}</td>
+        <td class="px-4 py-2 t-email">{{.Email}}</td>
+        <td class="px-4 py-2 t-phone">{{.Phone}}</td>
+        <td class="px-4 py-2 flex gap-2">
+          <button class="edit-btn border rounded px-2 py-1 text-xs">编辑</button>
+          <button class="pw-btn border rounded px-2 py-1 text-xs">改密</button>
+          <button class="del-btn border rounded px-2 py-1 text-xs text-red-600">删除</button>
+        </td>
+      </tr>
+    {{end}}
+    </tbody>
+  </table>
+</div>
+{{else}}<p class="text-slate-500">暂无讲师。点击“新增讲师”添加。</p>{{end}}
+{{end}}
+
+<!-- 新增/编辑弹窗 -->
+<div id="edit-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center">
+  <div class="bg-white rounded-lg p-6 w-full max-w-md">
+    <h2 id="edit-title" class="font-semibold mb-3">新增讲师</h2>
+    <div class="space-y-2">
+      <input id="f-name" class="w-full border rounded px-3 py-2 text-sm" placeholder="姓名">
+      <input id="f-email" class="w-full border rounded px-3 py-2 text-sm" placeholder="邮箱">
+      <input id="f-phone" class="w-full border rounded px-3 py-2 text-sm" placeholder="手机号">
+      <input id="f-password" class="w-full border rounded px-3 py-2 text-sm" placeholder="初始密码（仅新增必填）" type="password">
+    </div>
+    <div class="flex justify-end gap-2 mt-3">
+      <button id="cancel-edit" class="border rounded px-3 py-2 text-sm">取消</button>
+      <button id="submit-edit" class="bg-indigo-600 text-white rounded px-3 py-2 text-sm">保存</button>
+    </div>
+    <p id="edit-msg" class="text-sm mt-2"></p>
+  </div>
+</div>
+
+<!-- 改密弹窗 -->
+<div id="pw-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center">
+  <div class="bg-white rounded-lg p-6 w-full max-w-md">
+    <h2 class="font-semibold mb-3">重置讲师密码</h2>
+    <input id="f-newpw" class="w-full border rounded px-3 py-2 text-sm" placeholder="新密码" type="password">
+    <div class="flex justify-end gap-2 mt-3">
+      <button id="cancel-pw" class="border rounded px-3 py-2 text-sm">取消</button>
+      <button id="submit-pw" class="bg-indigo-600 text-white rounded px-3 py-2 text-sm">保存</button>
+    </div>
+    <p id="pw-msg" class="text-sm mt-2"></p>
+  </div>
+</div>
+{{template "foot" .}}
+{{end}}
