@@ -1,0 +1,27 @@
+{{define "my_schedule.html"}}{{template "head" .}}
+{{template "nav" .}}
+<h1 class="text-xl font-semibold mb-4">我的课表</h1>
+{{with $d := .Data}}
+{{if $d.enrollments}}
+<div class="bg-white rounded-lg shadow overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-100 text-slate-600">
+      <tr><th class="text-left px-4 py-2">课程</th><th class="text-left px-4 py-2">日期</th><th class="text-left px-4 py-2">时间</th><th class="text-left px-4 py-2">地点</th><th class="text-left px-4 py-2">讲师</th></tr>
+    </thead>
+    <tbody>
+    {{range $d.enrollments}}
+      <tr class="border-t hover:bg-slate-50">
+        <td class="px-4 py-2"><a href="/courses/{{.Course.ID}}" class="text-indigo-600">{{if .Course}}{{.Course.Title}}{{end}}</a></td>
+        <td class="px-4 py-2">{{if .Course}}{{.Course.Date}}{{end}}</td>
+        <td class="px-4 py-2">{{if .Course}}{{.Course.StartTime}} - {{.Course.EndTime}}{{end}}</td>
+        <td class="px-4 py-2">{{if .Course}}{{.Course.Location}}{{end}}</td>
+        <td class="px-4 py-2">{{if .Course.Teacher}}{{.Course.Teacher.Name}}{{end}}</td>
+      </tr>
+    {{end}}
+    </tbody>
+  </table>
+</div>
+{{else}}<p class="text-slate-500">您尚未报名任何课程。</p>{{end}}
+{{end}}
+{{template "foot" .}}
+{{end}}
