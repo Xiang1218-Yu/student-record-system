@@ -1,0 +1,14 @@
+{{define "checkin.html"}}{{template "head" .}}
+{{template "nav" .}}
+{{with $d := .Data}}
+{{with $c := $d.course}}
+<div class="max-w-md mx-auto bg-white rounded-lg shadow p-6 mt-8 text-center">
+  <h1 class="text-xl font-semibold mb-1">课程签到</h1>
+  <p class="text-slate-500 text-sm mb-4">{{$c.Title}} · {{$c.Date}} {{$c.StartTime}}</p>
+  <p id="checkin-status" class="text-slate-600">准备签到…</p>
+  <button id="checkin-btn" data-course="{{$c.ID}}" data-token="{{$d.token}}" class="mt-4 bg-indigo-600 text-white rounded px-6 py-2 hover:bg-indigo-700">确认签到</button>
+</div>
+{{end}}
+{{end}}
+{{template "foot" .}}
+{{end}}

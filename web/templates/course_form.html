@@ -1,0 +1,62 @@
+{{define "course_form.html"}}{{template "head" .}}
+{{template "nav" .}}
+<div class="max-w-2xl bg-white rounded-lg shadow p-6">
+  <h1 class="text-xl font-semibold mb-4">创建课程</h1>
+  <form id="course-form" class="space-y-3">
+    <div>
+      <label class="block text-sm text-slate-600 mb-1">课程名称 *</label>
+      <input name="title" required class="w-full border rounded px-3 py-2">
+    </div>
+    <div>
+      <label class="block text-sm text-slate-600 mb-1">课程描述</label>
+      <textarea name="description" rows="3" class="w-full border rounded px-3 py-2"></textarea>
+    </div>
+    <div>
+      <label class="block text-sm text-slate-600 mb-1">讲师 *</label>
+      <select name="teacher_id" required class="w-full border rounded px-3 py-2">
+        {{with $d := .Data}}{{range $d.teachers}}<option value="{{.ID}}">{{.Name}} ({{.Email}})</option>{{end}}{{end}}
+      </select>
+    </div>
+    <div class="grid grid-cols-3 gap-3">
+      <div>
+        <label class="block text-sm text-slate-600 mb-1">日期 *</label>
+        <input type="date" name="date" required class="w-full border rounded px-3 py-2">
+      </div>
+      <div>
+        <label class="block text-sm text-slate-600 mb-1">开始时间 *</label>
+        <input type="time" name="start_time" required class="w-full border rounded px-3 py-2">
+      </div>
+      <div>
+        <label class="block text-sm text-slate-600 mb-1">结束时间 *</label>
+        <input type="time" name="end_time" required class="w-full border rounded px-3 py-2">
+      </div>
+    </div>
+    <div>
+      <label class="block text-sm text-slate-600 mb-1">地点</label>
+      <input name="location" class="w-full border rounded px-3 py-2">
+    </div>
+    <fieldset class="border rounded p-3">
+      <legend class="text-sm text-slate-600 px-1">批量创建（可选）</legend>
+      <label class="text-sm flex items-center gap-2 mb-2">
+        <input type="checkbox" name="repeat_weekly"> 按周重复
+      </label>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs text-slate-500">重复次数</label>
+          <input type="number" name="count" min="1" value="1" class="w-full border rounded px-3 py-2">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-500">或截止日期</label>
+          <input type="date" name="end_date" class="w-full border rounded px-3 py-2">
+        </div>
+      </div>
+    </fieldset>
+    <div class="flex gap-2">
+      <button type="submit" class="bg-indigo-600 text-white rounded px-4 py-2 hover:bg-indigo-700">保存</button>
+      <a href="/" class="border rounded px-4 py-2">取消</a>
+    </div>
+    <p id="form-msg" class="text-sm"></p>
+  </form>
+</div>
+{{template "foot" .}}
+{{end}}
