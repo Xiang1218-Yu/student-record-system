@@ -1,0 +1,21 @@
+{{define "login.html"}}{{template "head" .}}
+{{template "nav" .}}
+<div class="max-w-md mx-auto bg-white rounded-lg shadow p-6 mt-8">
+  <h1 class="text-xl font-semibold mb-4">登录</h1>
+  {{if .Data}}{{with $d := .Data}}{{if $d.error}}<p class="text-red-500 text-sm mb-3">{{$d.error}}</p>{{end}}{{end}}{{end}}
+  <form method="POST" action="/login" class="space-y-3">
+    <div>
+      <label class="block text-sm text-slate-600 mb-1">邮箱</label>
+      <input type="email" name="email" required class="w-full border rounded px-3 py-2" placeholder="you@example.com">
+    </div>
+    <div>
+      <label class="block text-sm text-slate-600 mb-1">密码</label>
+      <input type="password" name="password" required class="w-full border rounded px-3 py-2">
+    </div>
+    <button type="submit" class="w-full bg-indigo-600 text-white rounded py-2 hover:bg-indigo-700">登录</button>
+  </form>
+  <p class="text-sm text-slate-500 mt-4">没有账号？<a href="/register" class="text-indigo-600">注册</a></p>
+  <p class="text-xs text-slate-400 mt-2">默认管理员：admin@example.com / admin123</p>
+</div>
+{{template "foot" .}}
+{{end}}
