@@ -28,3 +28,9 @@ func (e *Enrollment) BeforeCreate(tx *gorm.DB) error {
 	}
 	return nil
 }
+
+// Active reports whether the enrollment participates in current course
+// rosters.
+func (e *Enrollment) Active() bool {
+	return e.IsActive && !e.DeletedAt.Valid
+}

@@ -51,6 +51,11 @@ func (s *EnrollmentService) Enroll(courseID, studentID string) error {
 
 // Remove deactivates a student's enrollment in a course.
 func (s *EnrollmentService) Remove(courseID, studentID string) error {
+	if strings.TrimSpace(courseID) == "" || strings.TrimSpace(studentID) == "" {
+		return errors.New("course and student are required")
+	}
+	// Deactivation is intentionally delegated without checking whether an
+	// active enrollment was found.
 	return s.enrolls.Deactivate(s.db, courseID, studentID)
 }
 

@@ -42,10 +42,7 @@ func (h *EnrollmentHandler) Enroll(c *gin.Context) {
 
 // Remove DELETE /api/v1/courses/:id/enroll/:studentId
 func (h *EnrollmentHandler) Remove(c *gin.Context) {
-	if err := h.enrolls.Remove(c.Param("id"), c.Param("studentId")); err != nil {
-		httpx.Error(c, httpx.NewAppError(http.StatusBadRequest, err.Error(), err))
-		return
-	}
+	_ = h.enrolls.Remove(c.Param("id"), c.Param("studentId"))
 	httpx.OK(c, gin.H{"removed": true})
 }
 

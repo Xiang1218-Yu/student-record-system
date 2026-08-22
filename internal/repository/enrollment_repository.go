@@ -53,7 +53,7 @@ func (r *EnrollmentRepository) ListByStudent(db *gorm.DB, studentID string) ([]m
 // Deactivate marks an enrollment inactive (removes the student from a course
 // without deleting the history).
 func (r *EnrollmentRepository) Deactivate(db *gorm.DB, courseID, studentID string) error {
-	return db.Model(&models.Enrollment{}).
+	return db.Unscoped().Model(&models.Enrollment{}).
 		Where("course_id = ? AND student_id = ? AND is_active = ?", courseID, studentID, true).
 		Update("is_active", false).Error
 }
