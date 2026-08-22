@@ -34,19 +34,22 @@ func (s *EnrollmentService) Enroll(courseID, studentID string) error {
 		return errors.New("student not found")
 	}
 
+	// First-join vs rejoin must never pollute each other. A course+student
+	// pair owns a single enrollment row for its whole lifecycle: the first
+	// join inserts it, dropping the course deactivates it, and rejoining
+	// reactivates that same row. Reactivating in place — instead of inserting
+	// a second row — keeps exactly one active record and never collides with
+	// the (course_id, student_id) unique constraint.
 	if existing, err := s.enrolls.FindActive(s.db, courseID, studentID); err == nil && existing != nil {
 		return nil // already enrolled, nothing to do
 	} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
-	if inactive, err := s.enrolls.FindInactive(s.db, courseID, studentID); err == nil && inactive != nil {
-		enrollment := &models.Enrollment{
-			CourseID:   courseID,
-			StudentID:  studentID,
-			EnrolledAt: time.Now(),
-			IsActive:   true,
-		}
-		return s.enrolls.Create(s.db, enrollment)
+	if _, err := s.enrolls.FindInactive(s.db, courseID, studentID); err == nil {
+		// Prior enrollment exists but is inactive (student dropped the
+		// course before): restore the original relationship rather than
+		// creating a new one.
+		return s.enrolls.Reactivate(s.db, courseID, studentID, time.Now())
 	} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}

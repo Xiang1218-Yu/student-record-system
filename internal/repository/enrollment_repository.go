@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"time"
+
 	"course-attendance/internal/models"
 
 	"gorm.io/gorm"
@@ -29,14 +31,31 @@ func (r *EnrollmentRepository) FindActive(db *gorm.DB, courseID, studentID strin
 	return &e, nil
 }
 
-// FindInactive loads the retained enrollment row for a course/student pair.
+// FindInactive loads the most recent inactive enrollment for a course/student
+// pair. A course+student maps to at most one enrollment row in the intended
+// lifecycle; ordering by enrolled_at desc simply makes the lookup deterministic
+// if a legacy database accumulated duplicate inactive rows before the fix.
 func (r *EnrollmentRepository) FindInactive(db *gorm.DB, courseID, studentID string) (*models.Enrollment, error) {
 	var e models.Enrollment
 	if err := db.Where("course_id = ? AND student_id = ? AND is_active = ?", courseID, studentID, false).
+		Order("enrolled_at desc").
 		First(&e).Error; err != nil {
 		return nil, err
 	}
 	return &e, nil
+}
+
+// Reactivate revives the existing enrollment row for a course/student pair,
+// stamping it as active again at the given time. It updates in place rather
+// than inserting, so rejoining preserves the single original relationship and
+// never collides with the (course_id, student_id) unique constraint.
+func (r *EnrollmentRepository) Reactivate(db *gorm.DB, courseID, studentID string, enrolledAt time.Time) error {
+	return db.Model(&models.Enrollment{}).
+		Where("course_id = ? AND student_id = ? AND is_active = ?", courseID, studentID, false).
+		Updates(map[string]any{
+			"is_active":  true,
+			"enrolled_at": enrolledAt,
+		}).Error
 }
 
 // ListStudents returns the active enrolled students for a course.
