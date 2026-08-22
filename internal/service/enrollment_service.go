@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -49,14 +50,34 @@ func (s *EnrollmentService) Enroll(courseID, studentID string) error {
 	return s.enrolls.Create(s.db, enrollment)
 }
 
-// Remove deactivates a student's enrollment in a course.
+// Remove deactivates a student's enrollment in a course. It reports a
+// not-found failure when no active enrollment exists (the student was never
+// enrolled or had already been removed), so a caller can distinguish a real
+// removal from a no-op instead of always seeing success. The history row is
+// kept (deactivated, not deleted), and re-enrolling creates a fresh active
+// enrollment, so removal never blocks later enrolment.
 func (s *EnrollmentService) Remove(courseID, studentID string) error {
 	if strings.TrimSpace(courseID) == "" || strings.TrimSpace(studentID) == "" {
-		return errors.New("course and student are required")
+		return fmt.Errorf("course and student are required: %w", ErrInvalidInput)
 	}
-	// Deactivation is intentionally delegated without checking whether an
-	// active enrollment was found.
-	return s.enrolls.Deactivate(s.db, courseID, studentID)
+	if _, err := s.enrolls.FindActive(s.db, courseID, studentID); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("no active enrollment for this student in the course: %w", ErrNotFound)
+		}
+		return err
+	}
+	affected, err := s.enrolls.Deactivate(s.db, courseID, studentID)
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
+		// The enrollment was active moments ago but is not anymore — it was
+		// removed concurrently between the check and the update. Treat it as
+		// not found rather than reporting a successful removal that did
+		// nothing.
+		return fmt.Errorf("no active enrollment for this student in the course: %w", ErrNotFound)
+	}
+	return nil
 }
 
 // ListStudents returns the active enrolled students for a course.

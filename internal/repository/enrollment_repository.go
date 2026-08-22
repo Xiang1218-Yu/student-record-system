@@ -51,9 +51,13 @@ func (r *EnrollmentRepository) ListByStudent(db *gorm.DB, studentID string) ([]m
 }
 
 // Deactivate marks an enrollment inactive (removes the student from a course
-// without deleting the history).
-func (r *EnrollmentRepository) Deactivate(db *gorm.DB, courseID, studentID string) error {
-	return db.Unscoped().Model(&models.Enrollment{}).
+// without deleting the history) and returns the number of rows it touched.
+// A zero count means no active enrollment matched, so the caller can tell a
+// real removal from a no-op (e.g. the student was never enrolled or had
+// already been removed). The history row is preserved, not deleted.
+func (r *EnrollmentRepository) Deactivate(db *gorm.DB, courseID, studentID string) (int64, error) {
+	res := db.Unscoped().Model(&models.Enrollment{}).
 		Where("course_id = ? AND student_id = ? AND is_active = ?", courseID, studentID, true).
-		Update("is_active", false).Error
+		Update("is_active", false)
+	return res.RowsAffected, res.Error
 }
