@@ -22,14 +22,24 @@ func (r *UserRepository) Create(db *gorm.DB, user *models.User) error {
 	return db.Create(user).Error
 }
 
-// CreateBatch persists imported users in input order.
+// CreateBatch persists imported users atomically: every user is written, or
+// none are. A failure partway through the batch rolls the whole group back so
+// the batch never leaves partial accounts behind — the import caller can then
+// surface a server error with the original cause rather than masking a
+// half-finished import as success on the next attempt. The underlying create
+// error is returned unwrapped so callers can preserve the original reason.
 func (r *UserRepository) CreateBatch(db *gorm.DB, users []*models.User) error {
-	for _, user := range users {
-		if err := db.Create(user).Error; err != nil {
-			return err
-		}
+	if len(users) == 0 {
+		return nil
 	}
-	return nil
+	return db.Transaction(func(tx *gorm.DB) error {
+		for _, user := range users {
+			if err := tx.Create(user).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 // FindByEmail loads a user by email.
