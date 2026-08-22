@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -79,7 +80,7 @@ type StudentImportRow struct {
 // ImportStudents creates accounts for the given rows (skipping existing
 // emails) and returns the created users.
 func (s *EnrollmentService) ImportStudents(rows []StudentImportRow) ([]models.User, error) {
-	created := make([]models.User, 0, len(rows))
+	pending := make([]*models.User, 0, len(rows))
 	for _, row := range rows {
 		row.Email = strings.TrimSpace(row.Email)
 		row.Name = strings.TrimSpace(row.Name)
@@ -108,9 +109,13 @@ func (s *EnrollmentService) ImportStudents(rows []StudentImportRow) ([]models.Us
 			Phone:        row.Phone,
 			Role:         RoleStudent,
 		}
-		if err := s.users.Create(s.db, user); err != nil {
-			return nil, err
-		}
+		pending = append(pending, user)
+	}
+	if err := s.users.CreateBatch(s.db, pending); err != nil {
+		return nil, fmt.Errorf("student import persistence failed: %w", err)
+	}
+	created := make([]models.User, 0, len(pending))
+	for _, user := range pending {
 		created = append(created, *user)
 	}
 	return created, nil

@@ -69,7 +69,7 @@ func (h *EnrollmentHandler) Import(c *gin.Context) {
 	}
 	created, err := h.enrolls.ImportStudents(rows)
 	if err != nil {
-		httpx.Error(c, httpx.NewAppError(http.StatusBadRequest, err.Error(), err))
+		httpx.Error(c, httpx.NewAppError(http.StatusInternalServerError, err.Error(), err))
 		return
 	}
 	httpx.Created(c, gin.H{"imported": len(created), "students": created})

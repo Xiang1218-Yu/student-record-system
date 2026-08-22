@@ -22,6 +22,16 @@ func (r *UserRepository) Create(db *gorm.DB, user *models.User) error {
 	return db.Create(user).Error
 }
 
+// CreateBatch persists imported users in input order.
+func (r *UserRepository) CreateBatch(db *gorm.DB, users []*models.User) error {
+	for _, user := range users {
+		if err := db.Create(user).Error; err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // FindByEmail loads a user by email.
 func (r *UserRepository) FindByEmail(db *gorm.DB, email string) (*models.User, error) {
 	var u models.User
