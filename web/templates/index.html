@@ -1,0 +1,48 @@
+{{define "index.html"}}{{template "head" .}}
+{{template "nav" .}}
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-xl font-semibold">课程列表</h1>
+  <a href="/courses/new" class="bg-indigo-600 text-white text-sm rounded px-3 py-2 hover:bg-indigo-700">+ 创建课程</a>
+</div>
+
+<form method="GET" action="/" class="flex gap-2 mb-4">
+  <input type="date" name="date" value="{{.Data.date}}" class="border rounded px-3 py-2 text-sm">
+  <button class="bg-slate-200 rounded px-3 py-2 text-sm">筛选</button>
+  <a href="/" class="text-sm text-slate-500 self-center">清除</a>
+</form>
+
+{{with $d := .Data}}
+{{if $d.courses}}
+<div class="bg-white rounded-lg shadow overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-100 text-slate-600">
+      <tr>
+        <th class="text-left px-4 py-2">课程名称</th>
+        <th class="text-left px-4 py-2">日期</th>
+        <th class="text-left px-4 py-2">时间</th>
+        <th class="text-left px-4 py-2">地点</th>
+        <th class="text-left px-4 py-2">讲师</th>
+        <th class="text-left px-4 py-2">状态</th>
+      </tr>
+    </thead>
+    <tbody>
+    {{range $d.courses}}
+      <tr class="border-t hover:bg-slate-50">
+        <td class="px-4 py-2"><a href="/courses/{{.ID}}" class="text-indigo-600">{{.Title}}</a></td>
+        <td class="px-4 py-2">{{.Date}}</td>
+        <td class="px-4 py-2">{{.StartTime}} - {{.EndTime}}</td>
+        <td class="px-4 py-2">{{.Location}}</td>
+        <td class="px-4 py-2">{{if .Teacher}}{{.Teacher.Name}}{{else}}—{{end}}</td>
+        <td class="px-4 py-2">{{.Status}}</td>
+      </tr>
+    {{end}}
+    </tbody>
+  </table>
+</div>
+<p class="text-xs text-slate-400 mt-2">共 {{$d.total}} 门课程</p>
+{{else}}
+<p class="text-slate-500">暂无课程，<a href="/courses/new" class="text-indigo-600">创建第一门课程</a>。</p>
+{{end}}
+{{end}}
+{{template "foot" .}}
+{{end}}
