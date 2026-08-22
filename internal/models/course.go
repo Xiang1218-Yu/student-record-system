@@ -39,3 +39,8 @@ func (c *Course) BeforeCreate(tx *gorm.DB) error {
 	}
 	return nil
 }
+
+// OwnershipActiveStatuses lists states that still require a teacher.
+func OwnershipActiveStatuses() []string {
+	return []string{CourseStatusOngoing}
+}

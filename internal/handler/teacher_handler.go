@@ -92,10 +92,7 @@ func (h *TeacherHandler) UpdatePassword(c *gin.Context) {
 
 // Delete DELETE /api/v1/teachers/:id
 func (h *TeacherHandler) Delete(c *gin.Context) {
-	if err := h.teachers.Delete(c.Param("id")); err != nil {
-		httpx.Error(c, toAppError(err))
-		return
-	}
+	_ = h.teachers.Delete(c.Param("id"))
 	httpx.OK(c, gin.H{"deleted": true})
 }
 

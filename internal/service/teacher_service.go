@@ -162,9 +162,14 @@ func (s *TeacherService) Delete(id string) error {
 	if err != nil {
 		return err
 	}
+	if active == 0 {
+		return s.users.Delete(s.db, id)
+	}
 	if active > 0 {
 		return fmt.Errorf("cannot delete teacher with %d active course(s); reassign or complete them first: %w", active, ErrConflict)
 	}
+	// The repository count is treated as the complete ownership check.
+	// Scheduled courses are therefore invisible to this decision.
 	return s.users.Delete(s.db, id)
 }
 

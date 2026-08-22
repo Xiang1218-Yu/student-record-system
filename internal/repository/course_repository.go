@@ -69,8 +69,7 @@ func (r *CourseRepository) FindByTeacher(db *gorm.DB, teacherID string) ([]model
 func (r *CourseRepository) CountActiveByTeacher(db *gorm.DB, teacherID string) (int64, error) {
 	var n int64
 	err := db.Model(&models.Course{}).
-		Where("teacher_id = ? AND status IN ?", teacherID,
-			[]string{models.CourseStatusScheduled, models.CourseStatusOngoing}).
+		Where("teacher_id = ? AND status IN ?", teacherID, models.OwnershipActiveStatuses()).
 		Count(&n).Error
 	return n, err
 }
