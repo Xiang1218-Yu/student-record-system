@@ -29,6 +29,16 @@ func (r *EnrollmentRepository) FindActive(db *gorm.DB, courseID, studentID strin
 	return &e, nil
 }
 
+// FindInactive loads the retained enrollment row for a course/student pair.
+func (r *EnrollmentRepository) FindInactive(db *gorm.DB, courseID, studentID string) (*models.Enrollment, error) {
+	var e models.Enrollment
+	if err := db.Where("course_id = ? AND student_id = ? AND is_active = ?", courseID, studentID, false).
+		First(&e).Error; err != nil {
+		return nil, err
+	}
+	return &e, nil
+}
+
 // ListStudents returns the active enrolled students for a course.
 func (r *EnrollmentRepository) ListStudents(db *gorm.DB, courseID string) ([]models.User, error) {
 	var students []models.User

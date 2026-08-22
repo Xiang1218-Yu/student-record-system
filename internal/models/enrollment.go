@@ -10,9 +10,9 @@ import (
 // Enrollment mirrors the enrollments table linking students to courses.
 type Enrollment struct {
 	ID         string         `gorm:"type:uuid;primaryKey" json:"id"`
-	CourseID   string         `gorm:"type:uuid;not null;index" json:"course_id"`
+	CourseID   string         `gorm:"type:uuid;not null;index;uniqueIndex:uq_enrollment_course_student" json:"course_id"`
 	Course     *Course        `gorm:"foreignKey:CourseID" json:"course,omitempty"`
-	StudentID  string         `gorm:"type:uuid;not null;index" json:"student_id"`
+	StudentID  string         `gorm:"type:uuid;not null;index;uniqueIndex:uq_enrollment_course_student" json:"student_id"`
 	Student    *User          `gorm:"foreignKey:StudentID" json:"student,omitempty"`
 	EnrolledAt time.Time      `json:"enrolled_at"`
 	IsActive   bool           `gorm:"not null;default:true" json:"is_active"`

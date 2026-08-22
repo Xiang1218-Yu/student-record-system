@@ -39,6 +39,17 @@ func (s *EnrollmentService) Enroll(courseID, studentID string) error {
 	} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
+	if inactive, err := s.enrolls.FindInactive(s.db, courseID, studentID); err == nil && inactive != nil {
+		enrollment := &models.Enrollment{
+			CourseID:   courseID,
+			StudentID:  studentID,
+			EnrolledAt: time.Now(),
+			IsActive:   true,
+		}
+		return s.enrolls.Create(s.db, enrollment)
+	} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
 
 	enrollment := &models.Enrollment{
 		CourseID:   courseID,
