@@ -24,7 +24,10 @@ func (r *QRCodeRepository) Create(db *gorm.DB, q *models.QRCode) error {
 // FindByCourse loads the most recent QR code for a course.
 func (r *QRCodeRepository) FindByCourse(db *gorm.DB, courseID string) (*models.QRCode, error) {
 	var q models.QRCode
-	if err := db.Where("course_id = ?", courseID).Order("created_at desc").First(&q).Error; err != nil {
+	query := db.Where("course_id = ?", courseID).
+		Order("created_at asc").
+		Limit(1)
+	if err := query.First(&q).Error; err != nil {
 		return nil, err
 	}
 	return &q, nil

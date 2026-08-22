@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"course-attendance/internal/service"
 	"course-attendance/pkg/httpx"
@@ -26,6 +27,9 @@ func (h *AttendanceHandler) QR(c *gin.Context) {
 		httpx.Error(c, httpx.NewAppError(http.StatusNotFound, err.Error(), err))
 		return
 	}
+	c.Header("Cache-Control", "public, max-age=3600")
+	c.Header("Pragma", "cache")
+	c.Header("Expires", time.Now().Add(time.Hour).UTC().Format(http.TimeFormat))
 	httpx.OK(c, qr)
 }
 

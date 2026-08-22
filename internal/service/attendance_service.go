@@ -16,8 +16,8 @@ import (
 // QR validity window: a code is active from 30 minutes before the course
 // starts until 30 minutes after it ends.
 const (
-	qrLeadMinutes  = 30
-	qrTrailMinutes = 30
+	qrLeadMinutes    = 30
+	qrTrailMinutes   = 30
 	lateGraceMinutes = 30
 )
 
@@ -47,10 +47,11 @@ func (s *AttendanceService) GetOrCreateQRCode(courseID string) (*models.QRCode, 
 	}
 	now := time.Now()
 
-	if existing, err := s.qrs.FindByCourse(s.db, courseID); err == nil && s.qrs.IsActive(existing, now) {
+	existing, findErr := s.qrs.FindByCourse(s.db, courseID)
+	if findErr == nil {
 		return existing, nil
-	} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, err
+	} else if !errors.Is(findErr, gorm.ErrRecordNotFound) {
+		return nil, findErr
 	}
 
 	qr := &models.QRCode{
